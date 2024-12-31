@@ -226,7 +226,7 @@ DimPlot(ICs.inte, group.by = 'cell.type',label = T,repel = T)
 ## T subcluster ----
 T.sub <- subset(Clean_qc.merge.filtered, cells = rownames(ICs.inte@meta.data[ICs.inte$cell.type == 'T cells',]))
 
-## iontegrate
+## integrate
 T.inte <- T.sub %>%
   SCTransform(vars.to.regress = c('mitoRatio','rpRatio','G2M.Score','S.Score')) %>% 
   RunPCA() %>% 
