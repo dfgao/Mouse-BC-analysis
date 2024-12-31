@@ -27,15 +27,15 @@ milo.all.seu <- as.SingleCellExperiment(milo.all.seu,assay = 'SCT') %>%
   Milo() %>%
   miloR::buildGraph(k = 30, d = 50) %>% 
   makeNhoods(
-    prop = 0.2, #定义要随机抽样的图顶点的比例，通常为0.1-0.2                   
-    k = 30, #建议使用与buildGraph一样的k值           
-    d=50, #KNN降维数，建议使用与buildGraph一样的d值                     
+    prop = 0.2,                 
+    k = 30,       
+    d=50,                   
     refined = T)
 
 milo.all.seu <- countCells(milo.all.seu, 
                            meta.data = data.frame(colData(milo.all.seu)),                     
                            sample="orig.ident")
-milo.traj_design <- data.frame(colData(milo.all.seu))[,c("orig.ident", "condition")]#分别是重复样本ID和分组
+milo.traj_design <- data.frame(colData(milo.all.seu))[,c("orig.ident", "condition")]
 milo.traj_design$orig.ident <- as.factor(milo.traj_design$orig.ident)
 milo.traj_design <- distinct(milo.traj_design)
 rownames(milo.traj_design) <- milo.traj_design$orig.ident
@@ -157,7 +157,7 @@ obs_tbl$Cell_type <- c(rep(cell.number$cell.type.percise.new,c(cell.number$A3_T)
 )
 
 ## RUN LTSR 
-source('../../../01.hualun/02.mus.age.placenta/03.analysis/LTSR.raw.code.R')
+source('./LTSR.raw.code.R')
 results <- CellTypeCompositionAnalysis(obs_tbl, "Sample_ID", "Cell_type", c("Treatment",'Rep'), "Var_Num1")
 ranef_tbl <- results$ranef
 sdse_tbl <- results$sdse
@@ -891,13 +891,13 @@ ggplot2::ggplot(test,aes(x=cell.type,y=cnv_score))+
   xlab("") + 
   ylab("CNV score")
 
-# cnv in CAFs & Cancer cells
-choose.cnv <- test[test$cell.type == 'CAFs' | test$cell.type == 'Cancer cells',]
+# cnv in Padi4+ & Top2a+ cells
+choose.cnv <- test[test$cell.type == 'Padi4+ cancer cells' | test$cell.type == 'Top2a+ cancer cells',]
 choose.cnv <- choose.cnv %>% left_join(y = Clean_sct.inte.rm.lpt@meta.data[,c('cells','condition')], by = c('cell' = 'cells'))
-median(choose.cnv[choose.cnv$cell.type == 'Cancer cells' & choose.cnv$condition == 'WT',]$cnv_score)
-median(choose.cnv[choose.cnv$cell.type == 'Cancer cells' & choose.cnv$condition == 'Targeted',]$cnv_score)
-median(choose.cnv[choose.cnv$cell.type == 'CAFs' & choose.cnv$condition == 'WT',]$cnv_score)
-median(choose.cnv[choose.cnv$cell.type == 'CAFs' & choose.cnv$condition == 'Targeted',]$cnv_score)
+median(choose.cnv[choose.cnv$cell.type == 'Top2a+ cancer cells' & choose.cnv$condition == 'WT',]$cnv_score)
+median(choose.cnv[choose.cnv$cell.type == 'Top2a+ cancer cells' & choose.cnv$condition == 'Targeted',]$cnv_score)
+median(choose.cnv[choose.cnv$cell.type == 'Padi4+ cancer cells' & choose.cnv$condition == 'WT',]$cnv_score)
+median(choose.cnv[choose.cnv$cell.type == 'Padi4+ cancer cells' & choose.cnv$condition == 'Targeted',]$cnv_score)
 
 my_comparisons <- list(c("Untreated","Targeted"))
 ggplot(choose.cnv, aes(x=condition, y=cnv_score, fill=condition)) + 
@@ -933,14 +933,14 @@ p4 <- plots$CytoTRACE2_Boxplot_byPheno
 
 my_comparisons <- list(c("WT","Targeted"))
 ggboxplot(cytotrace2_result@meta.data, x="condition", y="CytoTRACE2_Score", width = 0.6, 
-                color = "black",#轮廓颜色 
-                fill="condition",#填充
+                color = "black",
+                fill="condition",
                 palette = "npg",
-                xlab = F, #不显示x轴的标签
-                bxp.errorbar=T,#显示误差条
-                bxp.errorbar.width=0.5, #误差条大小
-                size=.1, #箱型图边线的粗细 
-                outlier.shape=NA, #不显示outlier
+                xlab = F, 
+                bxp.errorbar=T,
+                bxp.errorbar.width=0.5, 
+                size=.1, 
+                outlier.shape=NA,
                 legend = "right",
                 alpha = 0.8) + 
   ylab('Potency score')  + 
@@ -952,10 +952,10 @@ ggboxplot(cytotrace2_result@meta.data, x="condition", y="CytoTRACE2_Score", widt
         axis.title.x = element_blank(),legend.position = 'none') +
   stat_compare_means(comparisons = my_comparisons, method = "wilcox.test")
 
-median(cytotrace2_result@meta.data[cytotrace2_result@meta.data$cell.type.percise.new == 'Cancer cells' & cytotrace2_result@meta.data$condition == 'WT',]$CytoTRACE2_Score)
-median(cytotrace2_result@meta.data[cytotrace2_result@meta.data$cell.type.percise.new == 'Cancer cells' & cytotrace2_result@meta.data$condition == 'Targeted',]$CytoTRACE2_Score)
-median(cytotrace2_result@meta.data[cytotrace2_result@meta.data$cell.type.percise.new == 'CAFs' & cytotrace2_result@meta.data$condition == 'WT',]$CytoTRACE2_Score)
-median(cytotrace2_result@meta.data[cytotrace2_result@meta.data$cell.type.percise.new == 'CAFs' & cytotrace2_result@meta.data$condition == 'Targeted',]$CytoTRACE2_Score)
+median(cytotrace2_result@meta.data[cytotrace2_result@meta.data$cell.type.percise.new == Top2a+ cancer cells' & cytotrace2_result@meta.data$condition == 'WT',]$CytoTRACE2_Score)
+median(cytotrace2_result@meta.data[cytotrace2_result@meta.data$cell.type.percise.new == 'Top2a+ cancer cells' & cytotrace2_result@meta.data$condition == 'Targeted',]$CytoTRACE2_Score)
+median(cytotrace2_result@meta.data[cytotrace2_result@meta.data$cell.type.percise.new == 'Padi4+ cancer cells' & cytotrace2_result@meta.data$condition == 'WT',]$CytoTRACE2_Score)
+median(cytotrace2_result@meta.data[cytotrace2_result@meta.data$cell.type.percise.new == 'Padi4+ cancer cells' & cytotrace2_result@meta.data$condition == 'Targeted',]$CytoTRACE2_Score)
 # 11.T cells -----
 
 ## 01.UMAP
@@ -985,15 +985,15 @@ com.dot.new(T.inte, feature = c('Cd8a','Filip1','Srgap3',
 #   Milo() %>%
 #   miloR::buildGraph(k = 20, d = 30) %>% 
 #   makeNhoods(
-#     prop = 0.5, #定义要随机抽样的图顶点的比例，通常为0.1-0.2                   
-#     k = 20, #建议使用与buildGraph一样的k值           
-#     d=30, #KNN降维数，建议使用与buildGraph一样的d值                     
+#     prop = 0.5,                  
+#     k = 20,         
+#     d=30,                    
 #     refined = T)
 # 
 # milo.T.seu <- countCells(milo.T.seu, 
 #                            meta.data = data.frame(colData(milo.T.seu)),                     
 #                            sample="orig.ident")
-# milo.traj_design <- data.frame(colData(milo.T.seu))[,c("orig.ident", "condition")]#分别是重复样本ID和分组
+# milo.traj_design <- data.frame(colData(milo.T.seu))[,c("orig.ident", "condition")]
 # milo.traj_design$orig.ident <- as.factor(milo.traj_design$orig.ident)
 # milo.traj_design <- distinct(milo.traj_design)
 # rownames(milo.traj_design) <- milo.traj_design$orig.ident
@@ -1005,7 +1005,7 @@ com.dot.new(T.inte, feature = c('Cd8a','Filip1','Srgap3',
 # milo.T.seu <- buildNhoodGraph(milo.T.seu)
 # milo.da_results$logFC <- -milo.da_results$logFC
 # miloR::plotNhoodGraphDA(milo.T.seu, milo.da_results, alpha=0.1,) +
-#   scale_fill_gradient2(low="#4cc9f0",#修改颜色
+#   scale_fill_gradient2(low="#4cc9f0",
 #                        mid="#F2F2F2",
 #                        high="#FF5E5B",
 #                        name="log2FC",
@@ -1088,14 +1088,14 @@ p4 <- plots$CytoTRACE2_Boxplot_byPheno
 (p1+p2+p3+p4) + patchwork::plot_layout(ncol = 2)
 
 ggboxplot(cytotrace2.T@meta.data, x="condition", y="CytoTRACE2_Score", width = 0.6, 
-          color = "black",#轮廓颜色 
-          fill="condition",#填充
+          color = "black",
+          fill="condition",
           palette = "npg",
-          xlab = F, #不显示x轴的标签
-          bxp.errorbar=T,#显示误差条
-          bxp.errorbar.width=0.5, #误差条大小
-          size=.1, #箱型图边线的粗细 
-          outlier.shape=NA, #不显示outlier
+          xlab = F, 
+          bxp.errorbar=T,
+          bxp.errorbar.width=0.5,
+          size=.1, 
+          outlier.shape=NA, 
           legend = "right",
           alpha = 0.8) + 
   ylab('Potency score')  + 
@@ -1195,7 +1195,6 @@ for (ct in levels(T.inte$cell.type.new)) {
 
 patchwork::wrap_plots(c(plot.list),nrow = 2)
 
-
 plot.list.down <- list()
 for (ct in levels(T.inte$cell.type.new)) {
   tmp <- base::get(paste('T.cells.',ct,'Targeted_Untreated',sep = "_"))
@@ -1233,10 +1232,8 @@ T.inte <- AddModuleScore(T.inte,features = effect.mem.gene,name = 'effect.mem.sc
 T.inte <- AddModuleScore(T.inte,features = ifn.gene,name = 'ifn.score')
 T.inte <- AddModuleScore(T.inte,features = exhau_ifn.gene,name = 'exhau_ifn.score')
 
-
 com.dot.new(T.inte, feature = c('exhaustion.score1','effect.mem.score1','ifn.score1','exhau_ifn.score1')
             ,groups = "condition",strip.color = c(npg.cols)[1:15])
-
 
 FeaturePlot(T.inte, 
             features = c('Gzmk','Gzma','Gzmh'),split.by = 'condition',
@@ -1261,7 +1258,6 @@ median(eff.mem.score[eff.mem.score$cell.type.new == 'Cd8 + T' & eff.mem.score$co
 median(eff.mem.score[eff.mem.score$cell.type.new == 'Cd8 + T' & eff.mem.score$condition == 'Targeted',]$effect.mem.score1)
 median(eff.mem.score[eff.mem.score$cell.type.new == 'Cd4 + T' & eff.mem.score$condition == 'WT',]$effect.mem.score1)
 median(eff.mem.score[eff.mem.score$cell.type.new == 'Cd4 + T' & eff.mem.score$condition == 'Targeted',]$effect.mem.score1)
-
 
 ### T. splice mRNA
 t.sp <- sp_unsp[sp_unsp$cell.type.percise.new == 'T cells',]
@@ -1447,11 +1443,9 @@ median(sp_unsp[sp_unsp$cell.type.percise.new == 'Padi4 + cancer cells' & sp_unsp
 median(sp_unsp[sp_unsp$cell.type.percise.new == 'Padi4 + cancer cells' & sp_unsp$condition == 'Targeted',]$unsp_ratio)
 
 
-# 15.SCENIC run by pySCENIC, not USE -----
+# 15.SCENIC run by pySCENIC, DISCARD -----
 
-
-
-# 16.metabolism for T cells discard-----
+# 16.metabolism for T cells discard DISCARD-----
 dir.create('/data/02.project/00.other.lab/07.lihaohuan/03.analysis/compass')
 
 T.counts <- GetAssayData(T.inte,assay = 'RNA',slot = 'counts') %>% as.data.frame()
@@ -1665,7 +1659,7 @@ ggplot(result, aes(x = bin_numeric, y = ratio)) +
   theme_bw() + 
   theme(axis.text = element_text(size = 15),axis.title = element_text(size = 15))
 
-# 18.Pi & Ti NOT FIT as samples is 2 vs 2 NOT USE----
+# 18.Pi & Ti NOT FIT as samples is 2 vs 2 DISCARD----
 cell.number <- FetchData(Clean_sct.inte.rm.lpt, 
                          vars = c("condition", "cell.type.percise.new")) %>%
   dplyr::count(condition, cell.type.percise.new) %>% 
@@ -1726,5 +1720,3 @@ visCluster(object = ht.data,
         go.size = 8,
         add.bar = T)
 dev.off()
-
-
